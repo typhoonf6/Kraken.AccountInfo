@@ -1,5 +1,6 @@
 ﻿using PropertyChanged;
 using System.ComponentModel;
+using Xamarin.Forms;
 
 namespace Kraken.AccountInfo
 {
@@ -18,6 +19,16 @@ namespace Kraken.AccountInfo
         /// The event that is fired is when any child property changes its value
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+
+        /// <summary>
+        /// Grabs the service dependency to access the Kraken API
+        /// </summary>
+        public IKrakenAPIService<object> KrakenService => DependencyService.Get<IKrakenAPIService<object>>();
+
+        /// <summary>
+        /// Standard IsBusy flag
+        /// </summary>
+        public bool IsBusy { get; set; }
     }
 }
 

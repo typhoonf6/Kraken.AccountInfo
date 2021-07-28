@@ -1,6 +1,4 @@
-﻿using Kraken.AccountInfo.ViewModels;
-using Kraken.AccountInfo.Views;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
 
@@ -11,13 +9,10 @@ namespace Kraken.AccountInfo
         public AppShell()
         {
             InitializeComponent();
-            Routing.RegisterRoute(nameof(ItemDetailPage), typeof(ItemDetailPage));
-            Routing.RegisterRoute(nameof(NewItemPage), typeof(NewItemPage));
-        }
 
-        private async void OnMenuItemClicked(object sender, EventArgs e)
-        {
-            await Shell.Current.GoToAsync("//LoginPage");
+            // Page routes
+            Routing.RegisterRoute(nameof(PersonalDetailsPage), typeof(PersonalDetailsPage));
+            Routing.RegisterRoute(nameof(AllCoinsPage), typeof(AllCoinsPage));
         }
     }
 }

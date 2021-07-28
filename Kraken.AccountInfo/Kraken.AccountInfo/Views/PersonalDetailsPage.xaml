@@ -1,12 +1,61 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Kraken.AccountInfo.PersonalDetailsPage">
+             x:Class="Kraken.AccountInfo.PersonalDetailsPage"
+             BackgroundColor="#ECECEC">
+    
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+
+        <StackLayout Margin="10">
+            
+            <!-- Account Balance -->
+            <Label Text="$30,000.00" 
+                   FontSize="Title"
+                   HorizontalTextAlignment="Center"/>
+
+            <!-- Coin List -->
+            <CollectionView>
+
+                <!-- Shown if the item source for the collection view is empty -->
+                <CollectionView.EmptyView>
+                    <Frame CornerRadius="6"
+                           HasShadow="True"
+                           BackgroundColor="White">
+                        <StackLayout>
+                            <Image Source="https://cdn.dribbble.com/users/2140/screenshots/3814090/bitcoin_2x.png?compress=1&amp;resize=400x300" />
+                            <Label Text="No Information to Show"
+                                   FontSize="Subtitle"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                            <Button Text="Login to Get Info"
+                                    Margin="250,0" />
+                        </StackLayout>
+                    </Frame>
+                </CollectionView.EmptyView>
+
+                <!-- Item Template for the coin list -->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Frame HasShadow="True"
+                                   CornerRadius="6"
+                                   BackgroundColor="White">
+                                <StackLayout Orientation="Horizontal">
+                                    <Image Source="https://cdn.dribbble.com/users/2140/screenshots/3814090/bitcoin_2x.png?compress=1&amp;resize=400x300" />
+                                    <StackLayout>
+                                        <Label Text="BTC"
+                                               FontSize="Large"/>
+                                        <Label Text="$50,000"
+                                               FontSize="Medium"/>
+                                    </StackLayout>
+                                </StackLayout>
+                            </Frame>
+                        </ViewCell>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
         </StackLayout>
+        
     </ContentPage.Content>
 </ContentPage>

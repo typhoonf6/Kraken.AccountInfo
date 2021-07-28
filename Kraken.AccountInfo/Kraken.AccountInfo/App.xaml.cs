@@ -9,7 +9,9 @@ namespace Kraken.AccountInfo
         {
             InitializeComponent();
 
-            //DependencyService.Register<MockDataStore>();
+            // Registster the service dependency
+            DependencyService.Register<KrakenAPIService>();
+
             MainPage = new AppShell();
         }
 
