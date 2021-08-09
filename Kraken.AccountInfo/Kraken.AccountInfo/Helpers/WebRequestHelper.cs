@@ -1,6 +1,11 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using System;
+using System.Net;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Net.Http;
+using System.Collections.Generic;
 
 namespace Kraken.AccountInfo
 {
@@ -12,81 +17,94 @@ namespace Kraken.AccountInfo
     public class WebRequestHelper
     {
         /// <summary>
-        /// Signs a message with apiKey
+        /// Static http client to use for life of application
         /// </summary>
-        /// <param name="endpoint">The REST endpoint</param>
-        /// <param name="postData">The request</param>
-        /// <param name="apiPrivateKey"></param>
+        private static HttpClient _httpClient;
+
+        /// <summary>
+        /// Makes a signed request
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="endpoint"></param>
+        /// <param name="publicKey"></param>
+        /// <param name="privateKey"></param>
         /// <returns></returns>
-        public static string SignMessage(string endpoint, string postData, string apiPrivateKey)
+        public static async Task<string> MakeSignedRequestAsync(MyWebRequest request, string publicKey, 
+            string privateKey, List<KeyValuePair<string, string>> postData = null)
         {
-            // Step 1: concatenate postData + endpoint
-            var message = postData + endpoint;
+            init();
+            var nonce = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
-            //Step 2: hash the result of step 1 with SHA256
-            var hash256 = new SHA256Managed();
-            var hash = hash256.ComputeHash(Encoding.UTF8.GetBytes(message));
+            if (postData != null)
+                postData.Add(new KeyValuePair<string, string>("nonce", nonce.ToString()));
+            else
+                postData = new List<KeyValuePair<string, string>> { 
+                    new KeyValuePair<string, string>("nonce", nonce.ToString()) 
+                };
 
-            //step 3: base64 decode apiPrivateKey
-            var secretDecoded = Convert.FromBase64String(apiPrivateKey);
+            var urlEncoded = new FormUrlEncodedContent(postData);
+            var message = $"{nonce}{await urlEncoded.ReadAsStringAsync()}";
 
-            //step 4: use result of step 3 to hash the resultof step 2 with HMAC-SHA512
-            var hmacsha512 = new HMACSHA512(secretDecoded);
-            var hash2 = hmacsha512.ComputeHash(hash);
+            var signature = SignMessage(request.URIPath(), message, privateKey);
+            _httpClient.DefaultRequestHeaders.Add("API-Key", publicKey);
+            _httpClient.DefaultRequestHeaders.Add("API-Sign", signature);
 
-            //step 5: base64 encode the result of step 4 and return
-            return Convert.ToBase64String(hash2);
+            var response = await _httpClient.PostAsync(request.FullPath(), urlEncoded);
 
+            return await response.Content.ReadAsStringAsync();
         }
-
 
         /// <summary>
         /// Make the HTTP request
         /// </summary>
-        /// <param name="requestMethod">The method of request. This is likely on GET for this application</param>
         /// <param name="endpoint">Endpoint URL of the data request</param>
         /// <param name="postUrl"></param>
         /// <param name="postBody"></param>
         /// <returns></returns>
-        public string MakeRequest(string requestMethod, string endpoint, string postUrl = "", string postBody = "")
+        public static async Task<string> MakeRequestAsync(MyWebRequest request, string param = null)
         {
+            init();
+            string fullPath = request.FullPath();
+            if (param != null)
+                fullPath = $"{fullPath}?{param}";
+            var response = await _httpClient.GetAsync(fullPath);
+            return await response.Content.ReadAsStringAsync();
+        }
 
-            /*if (!checkCertificate)
+        /// <summary>
+        /// Signs a message using Kraken specification
+        /// </summary>
+        /// <param name="endpoint">The REST endpoint</param>
+        /// <param name="privateKey">Private key generated at kraken website</param>
+        /// <param name="nonce">Uniquely generated integer as per kraken api requirements</param>
+        /// <returns></returns>
+        public static string SignMessage(string endpoint, string message, string privateKey)
+        {
+            using (var hash256 = new SHA256Managed())
+            using (var hmacsha512 = new HMACSHA512(Convert.FromBase64String(privateKey)))
             {
-                ServicePointManager.ServerCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+                var messageHash = hash256.ComputeHash(Encoding.UTF8.GetBytes(message));
+
+                var hash = Encoding.UTF8.GetBytes(endpoint).Concat(messageHash);
+
+                var hash2 = hmacsha512.ComputeHash(hash.ToArray());
+
+                return Convert.ToBase64String(hash2);
             }
-            using (var client = new WebClient())
+        }
+
+        /// <summary>
+        /// Initilizes the <see cref="HttpClient"/> if null,
+        /// or just clears the headers from the last time it was used.
+        /// </summary>
+        private static void init()
+        {
+            if (_httpClient != null)
             {
-                var url = apiPath + endpoint + "?" + postUrl;
-
-                //create authentication headers
-                if (apiPublicKey != null && apiPrivateKey != null)
-                {
-                    var postData = postUrl + postBody;
-                    var signature = SignMessage(endpoint, postData);
-                    client.Headers.Add("APIKey", apiPublicKey);
-                    client.Headers.Add("Authent", signature);
-                }
-
-                if (requestMethod == "POST" && postBody.Length > 0)
-                {
-                    NameValueCollection parameters = new NameValueCollection();
-                    String[] bodyArray = postBody.Split('&');
-                    foreach (String pair in bodyArray)
-                    {
-                        String[] splitPair = pair.Split('=');
-                        parameters.Add(splitPair[0], splitPair[1]);
-                    }
-
-                    var response = client.UploadValues(url, "POST", parameters);
-                    return Encoding.UTF8.GetString(response);
-                }
-                else
-                {
-                    return client.DownloadString(url);
-                }
-            }*/
-            throw new NotImplementedException();
+                _httpClient.DefaultRequestHeaders.Clear();
+                return;
+            }
+            _httpClient = new HttpClient();
         }
     }
 }

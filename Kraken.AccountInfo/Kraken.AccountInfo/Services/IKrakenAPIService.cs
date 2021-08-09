@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Net.WebSockets;
+﻿using QuickGraph;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Kraken.AccountInfo
@@ -7,10 +7,10 @@ namespace Kraken.AccountInfo
     /// <summary>
     /// Service contract for dependency injection
     /// </summary>
-    public interface IKrakenAPIService<T>
+    public interface IKrakenAPIService
     {
-        Task<IEnumerable<T>> GetPublicTickers();
-        Task<IEnumerable<T>> GetAccountBalance();
-        Task<bool> CheckAccess();
+        Task CreateCurrencyGraph();
+        Task<IEnumerable<Edge<string>>> GetConversionRoute(string root, string target);
+        Task<string> GetUserHoldings();
     }
 }

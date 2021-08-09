@@ -23,7 +23,7 @@ namespace Kraken.AccountInfo
         /// <summary>
         /// Grabs the service dependency to access the Kraken API
         /// </summary>
-        public IKrakenAPIService<object> KrakenService => DependencyService.Get<IKrakenAPIService<object>>();
+        public IKrakenAPIService KrakenService => DependencyService.Get<IKrakenAPIService>();
 
         /// <summary>
         /// Standard IsBusy flag

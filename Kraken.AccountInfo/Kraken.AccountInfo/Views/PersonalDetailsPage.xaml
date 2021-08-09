@@ -1,8 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:krak="clr-namespace:Kraken.AccountInfo"
              x:Class="Kraken.AccountInfo.PersonalDetailsPage"
              BackgroundColor="#ECECEC">
+
+    <ContentPage.BindingContext>
+        <krak:PersonalCoinsViewModel/>
+    </ContentPage.BindingContext>
     
     <ContentPage.Content>
 
@@ -14,47 +19,50 @@
                    HorizontalTextAlignment="Center"/>
 
             <!-- Coin List -->
-            <CollectionView>
+            <RefreshView IsRefreshing="{Binding IsBusy}"
+                         Command="{Binding RefreshCommand}"
+                         BackgroundColor="Transparent">
 
-                <!-- Shown if the item source for the collection view is empty -->
-                <CollectionView.EmptyView>
-                    <Frame CornerRadius="6"
-                           HasShadow="True"
-                           BackgroundColor="White">
-                        <StackLayout>
-                            <Image Source="https://cdn.dribbble.com/users/2140/screenshots/3814090/bitcoin_2x.png?compress=1&amp;resize=400x300" />
-                            <Label Text="No Information to Show"
-                                   FontSize="Subtitle"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
-                            <Button Text="Login to Get Info"
-                                    Margin="250,0" />
-                        </StackLayout>
-                    </Frame>
-                </CollectionView.EmptyView>
+                <CollectionView ItemsSource="{Binding Assets}">
 
-                <!-- Item Template for the coin list -->
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
+                    <!-- Shown if the item source for the collection view is empty -->
+                    <CollectionView.EmptyView>
+                        <Frame CornerRadius="6"
+                               HasShadow="True"
+                               BackgroundColor="White">
+                            <StackLayout>
+                                <Image Source="https://cdn.dribbble.com/users/2140/screenshots/3814090/bitcoin_2x.png?compress=1&amp;resize=400x300" />
+                                <Label Text="No Information to Show"
+                                       FontSize="Subtitle"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                                <Button Text="Login to Get Info"
+                                        Margin="250,0" />
+                            </StackLayout>
+                        </Frame>
+                    </CollectionView.EmptyView>
+
+                    <!-- Item Template for the coin list -->
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
                             <Frame HasShadow="True"
                                    CornerRadius="6"
-                                   BackgroundColor="White">
+                                   BackgroundColor="White"
+                                   Padding="20">
                                 <StackLayout Orientation="Horizontal">
                                     <Image Source="https://cdn.dribbble.com/users/2140/screenshots/3814090/bitcoin_2x.png?compress=1&amp;resize=400x300" />
-                                    <StackLayout>
-                                        <Label Text="BTC"
-                                               FontSize="Large"/>
-                                        <Label Text="$50,000"
-                                               FontSize="Medium"/>
+                                    <StackLayout VerticalOptions="Center">
+                                        <Label Text="{Binding Name}"
+                                                   FontSize="Large"/>
+                                        <Label Text="{Binding Amount}"
+                                                   FontSize="Medium"/>
                                     </StackLayout>
                                 </StackLayout>
                             </Frame>
-                        </ViewCell>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
         </StackLayout>
         
     </ContentPage.Content>
