@@ -1,8 +1,7 @@
 ﻿namespace Kraken.AccountInfo
 {
-    public class KrakenPair
+    public class Pair
     {
-
         /// <summary>
         /// Conversion pair thats split
         /// </summary>
@@ -37,10 +36,7 @@
         public string Base { get; set; }
         public string @base
         {
-            set
-            {
-                Base = value;
-            }
+            set => Base = value;
         }
 
         /// <summary>
@@ -48,15 +44,12 @@
         /// </summary>
         public string Quote { get; set; }
         public string quote {
-            set
-            {
-                Quote = value;
-            }
+            set => Quote = value;
         }
 
         /// <summary>
-        /// Rate of conversion from source to target
+        /// Ticker info for the asset pair
         /// </summary>
-        public double ConversationRate { get; set;  }
+        public Ticker Ticker { get; set; }
     }
 }

@@ -23,7 +23,7 @@
                          Command="{Binding RefreshCommand}"
                          BackgroundColor="Transparent">
 
-                <CollectionView ItemsSource="{Binding Assets}">
+                <CollectionView ItemsSource="{Binding UserAssets}">
 
                     <!-- Shown if the item source for the collection view is empty -->
                     <CollectionView.EmptyView>
@@ -52,10 +52,12 @@
                                 <StackLayout Orientation="Horizontal">
                                     <Image Source="https://cdn.dribbble.com/users/2140/screenshots/3814090/bitcoin_2x.png?compress=1&amp;resize=400x300" />
                                     <StackLayout VerticalOptions="Center">
-                                        <Label Text="{Binding Name}"
+                                        <Label Text="{Binding altname}"
                                                    FontSize="Large"/>
                                         <Label Text="{Binding Amount}"
                                                    FontSize="Medium"/>
+                                        <Label Text="{Binding Value}"
+                                               FontSize="Medium"/>
                                     </StackLayout>
                                 </StackLayout>
                             </Frame>
