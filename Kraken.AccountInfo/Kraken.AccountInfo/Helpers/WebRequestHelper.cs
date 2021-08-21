@@ -32,6 +32,7 @@ namespace Kraken.AccountInfo
         public static async Task<string> MakeSignedRequestAsync(MyWebRequest request, string publicKey, 
             string privateKey, List<KeyValuePair<string, string>> postData = null)
         {
+            
             init();
             var nonce = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 

@@ -6,9 +6,9 @@
     public class Asset
     {
         /// <summary>
-        /// Abbreviated name of the asset
+        /// Alternative name of the asset
         /// </summary>
-        public string Name { get; set; }
+        public string altname { get; set; }
 
         /// <summary>
         /// Amount of the asset held
@@ -16,19 +16,8 @@
         public double Amount { get; set; }
 
         /// <summary>
-        /// Value in chosen currency
+        /// Value of the asset in app configured currency
         /// </summary>
         public double Value { get; set; }
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="amount"></param>
-        public Asset(string name, double amount)
-        {
-            Name = name;
-            Amount = amount;
-        }
     }
 }
