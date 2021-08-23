@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FFImageLoading.Svg.Forms;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,8 +21,9 @@ namespace Kraken.AccountInfo.UWP
         public MainPage()
         {
             this.InitializeComponent();
-
-            LoadApplication(new Kraken.AccountInfo.App());
+            FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
+            var ignore = typeof(SvgCachedImage);
+            LoadApplication(new AccountInfo.App());
         }
     }
 }

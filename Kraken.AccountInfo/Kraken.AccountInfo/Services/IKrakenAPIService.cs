@@ -10,9 +10,7 @@ namespace Kraken.AccountInfo
     /// </summary>
     public interface IKrakenAPIService
     {
-        IEnumerable<Edge<string>> GetConversionRoute(string root, string target);
-        Task UpdateTicker(string tickerName);
-        Task<ObservableRangeCollection<Asset>> GetBalance();
-        Task GetAssetValue(Asset asset);
+        Task<ObservableRangeCollection<Asset>> InitializeDataAsync();
+        Task<ObservableRangeCollection<Asset>> RefreshDataAsync(ObservableRangeCollection<Asset> assets);
     }
 }

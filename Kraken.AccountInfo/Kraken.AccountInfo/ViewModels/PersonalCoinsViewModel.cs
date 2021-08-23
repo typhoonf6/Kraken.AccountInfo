@@ -34,17 +34,7 @@ namespace Kraken.AccountInfo
         /// <returns></returns>
         private async Task GetData()
         {
-            // TODO Wrap this in a single method that returns a list of assets.
-
-            // Get user holdings
-            UserAssets = await KrakenService.GetBalance();
-
-            // Apply conversion to assets and set value
-            foreach (var asset in UserAssets)
-            {
-                await KrakenService.GetAssetValue(asset);
-            }
-
+            UserAssets = await KrakenService.InitializeDataAsync();
             IsBusy = false;
         }
     }

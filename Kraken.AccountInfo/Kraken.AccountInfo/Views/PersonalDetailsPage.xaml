@@ -2,19 +2,29 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:krak="clr-namespace:Kraken.AccountInfo"
+             xmlns:ff="clr-namespace:FFImageLoading.Svg.Forms;assembly=FFImageLoading.Svg.Forms"
              x:Class="Kraken.AccountInfo.PersonalDetailsPage"
              BackgroundColor="#ECECEC">
 
     <ContentPage.BindingContext>
         <krak:PersonalCoinsViewModel/>
     </ContentPage.BindingContext>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <krak:TotalValueConverter x:Key="totalValueConverter"/>
+            <krak:CurrencyConverter x:Key="currencyConverter"/>
+            <krak:AssetIconSourceConverter x:Key="iconSourceConverter"/>
+            <ff:SvgImageSourceConverter x:Key="ffConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     
     <ContentPage.Content>
 
         <StackLayout Margin="10">
             
             <!-- Account Balance -->
-            <Label Text="$30,000.00" 
+            <Label Text="{Binding UserAssets, Converter={StaticResource totalValueConverter}}" 
                    FontSize="Title"
                    HorizontalTextAlignment="Center"/>
 
@@ -50,13 +60,17 @@
                                    BackgroundColor="White"
                                    Padding="20">
                                 <StackLayout Orientation="Horizontal">
-                                    <Image Source="https://cdn.dribbble.com/users/2140/screenshots/3814090/bitcoin_2x.png?compress=1&amp;resize=400x300" />
+                                    <ff:SvgCachedImage Source="{Binding IconSource, Converter={StaticResource ffConverter}}"
+                                                       WidthRequest="50"
+                                                       HeightRequest="50"/>
                                     <StackLayout VerticalOptions="Center">
                                         <Label Text="{Binding altname}"
                                                    FontSize="Large"/>
+                                        <Label Text="{Binding Type}"
+                                               FontSize="Small"/>
                                         <Label Text="{Binding Amount}"
                                                    FontSize="Medium"/>
-                                        <Label Text="{Binding Value}"
+                                        <Label Text="{Binding Value, Converter={StaticResource currencyConverter}}"
                                                FontSize="Medium"/>
                                     </StackLayout>
                                 </StackLayout>
