@@ -14,7 +14,6 @@
         <ResourceDictionary>
             <krak:TotalValueConverter x:Key="totalValueConverter"/>
             <krak:CurrencyConverter x:Key="currencyConverter"/>
-            <krak:AssetIconSourceConverter x:Key="iconSourceConverter"/>
             <ff:SvgImageSourceConverter x:Key="ffConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
@@ -35,11 +34,17 @@
 
                 <CollectionView ItemsSource="{Binding UserAssets}">
 
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical"
+                                           ItemSpacing="5"/>
+                    </CollectionView.ItemsLayout>
+
                     <!-- Shown if the item source for the collection view is empty -->
                     <CollectionView.EmptyView>
                         <Frame CornerRadius="6"
                                HasShadow="True"
-                               BackgroundColor="White">
+                               BackgroundColor="White"
+                               BorderColor="Black">
                             <StackLayout>
                                 <Image Source="https://cdn.dribbble.com/users/2140/screenshots/3814090/bitcoin_2x.png?compress=1&amp;resize=400x300" />
                                 <Label Text="No Information to Show"
@@ -72,6 +77,7 @@
                                                    FontSize="Medium"/>
                                         <Label Text="{Binding Value, Converter={StaticResource currencyConverter}}"
                                                FontSize="Medium"/>
+                                        
                                     </StackLayout>
                                 </StackLayout>
                             </Frame>

@@ -30,12 +30,15 @@ namespace Kraken.AccountInfo
         #region Collections
         private AdjacencyGraph<string, Edge<string>> CurrencyGraph;
 
-        public Dictionary<string, Asset> Assets;
+        private Dictionary<string, Asset> Assets;
 
-        public Dictionary<string, Pair> Pairs;
+        private Dictionary<string, Pair> Pairs;
+
+        private Keys info;
         #endregion
 
         #region Constructor
+
         /// <summary>
         /// Default Constructor
         /// </summary>
@@ -49,6 +52,7 @@ namespace Kraken.AccountInfo
             mAssetPairs = Application.Current.Resources["apiMethodAssetPairs"] as string;
             mTicker = Application.Current.Resources["apiMethodTicker"] as string;
         }
+
         #endregion
 
         #region Methods
@@ -87,7 +91,7 @@ namespace Kraken.AccountInfo
         private async Task<ObservableRangeCollection<Asset>> GetBalanceAsync()
         {
             var request = new MyWebRequest(APIPath, privateEndpoint, mAccountBalance);
-            var result = await WebRequestHelper.MakeSignedRequestAsync(request, UserInfo.PublicKey, UserInfo.PrivateKey);
+            var result = await WebRequestHelper.MakeSignedRequestAsync(request, info.PublicKey, info.PrivateKey);
             var dResult = JsonConvert.DeserializeObject<KrakenData<string>>(result).result;
 
             var userAssets = new ObservableRangeCollection<Asset>();
@@ -172,16 +176,20 @@ namespace Kraken.AccountInfo
             if (Assets != null || Pairs != null)
                 return;
 
+            var db = DependencyService.Get<IDatabaseService>();
+
             var infRequestTask = WebRequestHelper.MakeRequestAsync(new MyWebRequest(APIPath, publicEndpoint, mAssetInfo));
             var pairRequestTask = WebRequestHelper.MakeRequestAsync(new MyWebRequest(APIPath, publicEndpoint, mAssetPairs));
+            var keysTask = db.GetKeysAsync();
 
-            await Task.WhenAll(infRequestTask, pairRequestTask);
+            await Task.WhenAll(infRequestTask, pairRequestTask, keysTask);
 
             var infResult = await infRequestTask;
             var pairResult = await pairRequestTask;
 
             Assets = JsonConvert.DeserializeObject<KrakenData<Asset>>(infResult).result;
             Pairs = JsonConvert.DeserializeObject<KrakenData<Pair>>(pairResult).result;
+            info = await keysTask;
         }
        
         #endregion

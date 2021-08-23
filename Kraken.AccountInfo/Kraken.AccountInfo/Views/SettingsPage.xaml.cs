@@ -4,9 +4,9 @@ using Xamarin.Forms.Xaml;
 namespace Kraken.AccountInfo
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AllCoinsPage : ContentPage
+    public partial class SettingsPage : ContentPage
     {
-        public AllCoinsPage()
+        public SettingsPage()
         {
             InitializeComponent();
         }
