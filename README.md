@@ -32,7 +32,7 @@ Written in C# using Visual Studio 2019 and Xamarin.Forms
 *Android
 *iOS
 *UWP
-UWP and Android only tested
+UWP only tested
 
 ### NuGets
 * PropertyChanged.Fody 3.4.0
@@ -40,5 +40,5 @@ UWP and Android only tested
 * Xamarin.CommunityToolkit 1.2.0
 * SQLite-Net-PCL 1.7.335
 
-### Installing
-Connect your device and run a debug session to get the app on your phone I guess.
+### Possible Issues
+I'm using QuickGraph and Djikstra to figure out the conversion rate for the asset to the chosen currency. Unfortunately this package isn't supported by Xamarin and bitches when compiling. I've tested UWP and it's working, but have yet to try android or iOS
