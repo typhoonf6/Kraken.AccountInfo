@@ -4,7 +4,7 @@ using QuickGraph;
 using QuickGraph.Algorithms;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Xamarin.CommunityToolkit.ObjectModel;
 using Xamarin.Forms;
@@ -23,16 +23,17 @@ namespace Kraken.AccountInfo
         private readonly string publicEndpoint;
         private readonly string mAssetInfo;
         private readonly string mAccountBalance;
-        private readonly string mTradeBalance;
         private readonly string mAssetPairs;
         private readonly string mTicker;
         #endregion
 
+        #region Collections
         private AdjacencyGraph<string, Edge<string>> CurrencyGraph;
 
         public Dictionary<string, Asset> Assets;
 
         public Dictionary<string, Pair> Pairs;
+        #endregion
 
         #region Constructor
         /// <summary>
@@ -45,7 +46,6 @@ namespace Kraken.AccountInfo
             publicEndpoint = Application.Current.Resources["apiPublicEndpoint"] as string;
             mAssetInfo = Application.Current.Resources["apiMethodAssInf"] as string;
             mAccountBalance = Application.Current.Resources["apiMethodAccBal"] as string;
-            mTradeBalance = Application.Current.Resources["apiMethodTraBal"] as string;
             mAssetPairs = Application.Current.Resources["apiMethodAssetPairs"] as string;
             mTicker = Application.Current.Resources["apiMethodTicker"] as string;
         }
@@ -54,27 +54,53 @@ namespace Kraken.AccountInfo
         #region Methods
 
         /// <summary>
-        /// Gets the users current holdings from the API
+        /// Does a full pull of all API data to fill the collection initially
         /// </summary>
-        /// <returns>JSON string containing user balance. Should be deserialized.</returns>
-        public async Task<ObservableRangeCollection<Asset>> GetBalance()
+        /// <returns></returns>
+        public async Task<ObservableRangeCollection<Asset>> InitializeDataAsync()
         {
             await init();
 
+            var userAssets = await GetBalanceAsync();
+
+            userAssets = await GetAssetValue(userAssets);
+
+            return userAssets;
+        }
+
+        /// <summary>
+        /// Refreshes data necessary for recalculation of assets and their value
+        /// Must return a full set, as ObservableRangeCollection doesn't proc
+        /// if an update is done to an internal property.
+        /// </summary>
+        /// <param name="assets"></param>
+        /// <returns></returns>
+        public async Task<ObservableRangeCollection<Asset>> RefreshDataAsync(ObservableRangeCollection<Asset> assets)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets the users current holdings from the API
+        /// </summary>
+        /// <returns>JSON string containing user balance. Should be deserialized.</returns>
+        private async Task<ObservableRangeCollection<Asset>> GetBalanceAsync()
+        {
             var request = new MyWebRequest(APIPath, privateEndpoint, mAccountBalance);
             var result = await WebRequestHelper.MakeSignedRequestAsync(request, UserInfo.PublicKey, UserInfo.PrivateKey);
-            var assets = JsonConvert.DeserializeObject<KrakenData<string>>(result).result;
+            var dResult = JsonConvert.DeserializeObject<KrakenData<string>>(result).result;
 
             var userAssets = new ObservableRangeCollection<Asset>();
-            foreach (var key in assets.Keys)
+            foreach (var key in dResult.Keys)
             {
                 var userAsset = Assets[key];
-                var amount = double.Parse(assets[key]);
+                var amount = double.Parse(dResult[key]);
                 if (amount < 0.2)
                     continue;
                 userAsset.Amount = amount;
                 userAssets.Add(userAsset);
             }
+
             return userAssets;
         }
 
@@ -83,34 +109,59 @@ namespace Kraken.AccountInfo
         /// </summary>
         /// <param name="assetName"></param>
         /// <returns></returns>
-        public async Task UpdateTicker(string tickerName)
+        private async Task UpdateTickersAsync(ObservableRangeCollection<Asset> userAssets)
         {
             await init();
 
-            var arg = $"pair={tickerName}";
+            var sb = new StringBuilder("pair=");
+
+            foreach (var asset in userAssets)
+            {
+                foreach (var leg in asset.ConversionRoute)
+                {
+                    var tickerName = $"{leg.Source}{leg.Target},";
+                    sb.Append(tickerName);
+                }
+            }
+
+            sb.Remove(sb.Length - 1, 1);
             var request = new MyWebRequest(APIPath, publicEndpoint, mTicker);
-            var result = await WebRequestHelper.MakeRequestAsync(request, arg);
-            var ticker = JsonConvert.DeserializeObject<KrakenData<Ticker>>(result).result;
+            var result = await WebRequestHelper.MakeRequestAsync(request, sb.ToString());
+            var tickers = JsonConvert.DeserializeObject<KrakenData<Ticker>>(result).result;
             
-            Pairs[tickerName].Ticker = ticker[tickerName];
+            foreach (var ticker in tickers)
+            {
+                Pairs[ticker.Key].Ticker = ticker.Value;
+            }
         }
 
         /// <summary>
         /// Calculates the value of the asset given it's amount and the currency its to convert to
         /// </summary>
         /// <param name="asset"></param>
-        public async Task GetAssetValue(Asset asset)
+        private async Task<ObservableRangeCollection<Asset>> GetAssetValue(ObservableRangeCollection<Asset> userAssets)
         {
-            var route = GetConversionRoute(asset.altname, "AUD");
-
-            var conversionRate = 1.0;
-            foreach (var leg in route)
+            foreach (var asset in userAssets)
             {
-                var key = leg.Source + leg.Target;
-                await UpdateTicker(key);
-                conversionRate *= double.Parse(Pairs[key].Ticker.p[1]);
+                if (asset.ConversionRoute == null)
+                    asset.ConversionRoute = GetConversionRoute(asset.altname, "AUD");
             }
-            asset.Value = asset.Amount * conversionRate;
+
+            await UpdateTickersAsync(userAssets);
+
+            foreach (var asset in userAssets)
+            {
+                asset.ConversionRate = 1.0;
+                foreach (var leg in asset.ConversionRoute)
+                {
+                    var key = leg.Source + leg.Target;
+                    var askPrice = double.Parse(Pairs[key].Ticker.a[0]);
+                    var bidPrice = double.Parse(Pairs[key].Ticker.b[0]);
+                    asset.ConversionRate *= (askPrice + bidPrice) / 2.0;
+                }
+                asset.Value = asset.Amount * asset.ConversionRate;
+            }
+            return userAssets;
         }
 
         /// <summary>
@@ -121,13 +172,16 @@ namespace Kraken.AccountInfo
             if (Assets != null || Pairs != null)
                 return;
 
-            var request = new MyWebRequest(APIPath, publicEndpoint, mAssetInfo);
-            var result = await WebRequestHelper.MakeRequestAsync(request);
-            Assets = JsonConvert.DeserializeObject<KrakenData<Asset>>(result).result;
+            var infRequestTask = WebRequestHelper.MakeRequestAsync(new MyWebRequest(APIPath, publicEndpoint, mAssetInfo));
+            var pairRequestTask = WebRequestHelper.MakeRequestAsync(new MyWebRequest(APIPath, publicEndpoint, mAssetPairs));
 
-            request.Method = mAssetPairs;
-            result = await WebRequestHelper.MakeRequestAsync(request);
-            Pairs = JsonConvert.DeserializeObject<KrakenData<Pair>>(result).result;
+            await Task.WhenAll(infRequestTask, pairRequestTask);
+
+            var infResult = await infRequestTask;
+            var pairResult = await pairRequestTask;
+
+            Assets = JsonConvert.DeserializeObject<KrakenData<Asset>>(infResult).result;
+            Pairs = JsonConvert.DeserializeObject<KrakenData<Pair>>(pairResult).result;
         }
        
         #endregion
@@ -157,7 +211,7 @@ namespace Kraken.AccountInfo
                     CurrencyGraph.AddVertex(value.AltQuote);
 
                 CurrencyGraph.AddEdge(new Edge<string>(value.AltBase, value.AltQuote));
-                CurrencyGraph.AddEdge(new Edge<string>(value.AltQuote, value.AltBase));
+                // CurrencyGraph.AddEdge(new Edge<string>(value.AltQuote, value.AltBase));
             }
         }
 
@@ -167,26 +221,20 @@ namespace Kraken.AccountInfo
         /// <param name="root">Name of the root currency</param>
         /// <param name="target">Name of the target currency</param>
         /// <returns></returns>
-        public IEnumerable<Edge<string>> GetConversionRoute(string root, string target)
+        private IEnumerable<Edge<string>> GetConversionRoute(string root, string target)
         {
+            // Lazy load the graph
             CreateCurrencyGraph();
 
             Func<Edge<string>, double> edgeCost = edge => 1;
 
+            // Deal with staked assets
             if (root.EndsWith(".S") && !CurrencyGraph.ContainsVertex(root))
                 root = root.TrimEnd(new char[] { '.', 'S' });
-            try
-            {
-                TryFunc<string, IEnumerable<Edge<string>>> tryGetPaths = CurrencyGraph.ShortestPathsDijkstra(edgeCost, root);
-                _ = tryGetPaths(target, out IEnumerable<Edge<string>> result);
-                return result;
-            }
-            catch (Exception e)
-            {
-                
-                var message = e.Message;
-            }
-            return null;
+
+            TryFunc<string, IEnumerable<Edge<string>>> tryGetPaths = CurrencyGraph.ShortestPathsDijkstra(edgeCost, root);
+            _ = tryGetPaths(target, out IEnumerable<Edge<string>> result);
+            return result;
         }
         
         #endregion
