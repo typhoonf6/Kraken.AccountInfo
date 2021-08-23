@@ -21,9 +21,14 @@ namespace Kraken.AccountInfo
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
 
         /// <summary>
-        /// Grabs the service dependency to access the Kraken API
+        /// Grabs the service to access the Kraken API
         /// </summary>
         public IKrakenAPIService KrakenService => DependencyService.Get<IKrakenAPIService>();
+
+        /// <summary>
+        /// Grabs the service to access local database
+        /// </summary>
+        public IDatabaseService DatabaseService => DependencyService.Get<IDatabaseService>();
 
         /// <summary>
         /// Standard IsBusy flag

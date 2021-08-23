@@ -81,11 +81,8 @@
     <FlyoutItem Title="Personal Assets" Icon="icon_about.png">
         <ShellContent Route="PersonalDetailsPage" ContentTemplate="{DataTemplate local:PersonalDetailsPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="All Assets" Icon="icon_feed.png">
-        <ShellContent Route="AllCoinsPage" ContentTemplate="{DataTemplate local:AllCoinsPage}" />
-    </FlyoutItem>
-    <FlyoutItem Title="Settings" Icon="">
-        <ShellContent Route="AllCoinsPage" ContentTemplate="{DataTemplate local:AllCoinsPage}" />
+    <FlyoutItem Title="Settings" Icon="icon_feed.png">
+        <ShellContent Route="SettingsPage" ContentTemplate="{DataTemplate local:SettingsPage}" />
     </FlyoutItem>
 
     <!-- When the Flyout is visible this will be a menu item you can tie a click behavior to  -->
