@@ -12,8 +12,8 @@
             <x:String x:Key="apiPath">https://api.kraken.com</x:String>
             <x:String x:Key="apiPrivateEndpoint">/0/private/</x:String>
             <x:String x:Key="apiPublicEndpoint">/0/public/</x:String>
+            <x:String x:Key="apiMethodAssInf">Assets</x:String>
             <x:String x:Key="apiMethodAccBal">Balance</x:String>
-            <x:String x:Key="apiMethodTraBal">TradeBalance</x:String>
             <x:String x:Key="apiMethodAssetPairs">AssetPairs</x:String>
             <x:String x:Key="apiMethodTicker">Ticker</x:String>
 

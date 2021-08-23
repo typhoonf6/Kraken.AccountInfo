@@ -1,4 +1,7 @@
-﻿namespace Kraken.AccountInfo
+﻿using QuickGraph;
+using System.Collections.Generic;
+
+namespace Kraken.AccountInfo
 {
     /// <summary>
     /// Represents a single asset for display on UI
@@ -6,9 +9,35 @@
     public class Asset
     {
         /// <summary>
-        /// Abbreviated name of the asset
+        /// Alternative name of the asset
+        /// Note: Naming violation due to JSON deserialization.
         /// </summary>
-        public string Name { get; set; }
+        private string _altname;
+        public string altname 
+        {
+            get => _altname;
+            set
+            {
+                _altname = value;
+                if (value.EndsWith(".S"))
+                {
+                    value = value.TrimEnd('2', '.', 'S');
+                    Type = "Staked";
+                }
+                    
+                IconSource = $"resource://Kraken.AccountInfo.Resources.Icons.{value.ToLower()}.svg";
+            }
+        }
+
+        /// <summary>
+        /// Source address for the svg icon
+        /// </summary>
+        public string IconSource { get; set; }
+
+        /// <summary>
+        /// Type of asset. Staked/Spot
+        /// </summary>
+        public string Type { get; set; } = "Spot";
 
         /// <summary>
         /// Amount of the asset held
@@ -16,19 +45,20 @@
         public double Amount { get; set; }
 
         /// <summary>
-        /// Value in chosen currency
+        /// Value of the asset in app configured currency
         /// </summary>
         public double Value { get; set; }
 
         /// <summary>
-        /// Default constructor
+        /// The rate to convert the ammount to the Value
+        /// Note: This could be just in a converter, but just hard coding for now.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="amount"></param>
-        public Asset(string name, double amount)
-        {
-            Name = name;
-            Amount = amount;
-        }
+        public double ConversionRate { get; set; }
+
+        /// <summary>
+        /// The route to convert from amount to the value
+        /// based on the application selected currency
+        /// </summary>
+        public IEnumerable<Edge<string>> ConversionRoute { get; set; }
     }
 }

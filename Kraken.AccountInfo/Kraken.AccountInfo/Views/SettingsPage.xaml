@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:krak="clr-namespace:Kraken.AccountInfo"
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+             x:Class="Kraken.AccountInfo.SettingsPage"
+             BackgroundColor="#ECECEC">
+
+    <ContentPage.BindingContext>
+        <krak:SettingsViewModel x:Name="modelBinding"/>
+    </ContentPage.BindingContext>
+
+    <ContentPage.Behaviors>
+        <xct:EventToCommandBehavior EventName="Appearing"
+                                    Command="{Binding FillDataCommand}"/>
+    </ContentPage.Behaviors>
+
+    <ContentPage.Content>
+
+        <Frame BackgroundColor="White"
+               Padding="10"
+               Margin="10"
+               BorderColor="Black"
+               CornerRadius="5">
+
+            <StackLayout>
+                <Label Text="Settings Page"
+                       FontSize="Large"/>
+
+                <!-- Public Key Entry -->
+                <StackLayout Orientation="Horizontal"
+                             Padding="10"
+                             BindingContext="{Binding Keys}">
+                    <Label Text="Public Key:" 
+                           VerticalOptions="Center"
+                           FontSize="Small"/>
+                    <Entry Text="{Binding Source={x:Reference modelBinding}, Path=PublicEntryText}"
+                           Placeholder="{Binding PublicKey}"
+                           HorizontalOptions="FillAndExpand">
+                        <Entry.Behaviors>
+                            <xct:TextValidationBehavior MaximumLength="56"
+                                                        MinimumLength="56"
+                                                        x:Name="PublicEntryBehaviour"/>
+                        </Entry.Behaviors>
+                    </Entry>
+                </StackLayout>
+                <Label Text="Ensure you enter a valid string!"
+                       TextColor="IndianRed"
+                       IsVisible="{Binding Source={x:Reference PublicEntryBehaviour}, Path=IsNotValid}"/>
+
+                <!-- Private Key Entry -->
+                <StackLayout Orientation="Horizontal"
+                             Padding="10"
+                             BindingContext="{Binding Keys}">
+                    <Label Text="Private Key:" 
+                           VerticalOptions="Center"
+                           FontSize="Small"/>
+                    <Entry Text="{Binding Source={x:Reference modelBinding}, Path=PrivateEntryText}"
+                           Placeholder="{Binding PrivateKey}"
+                           HorizontalOptions="FillAndExpand">
+                        <Entry.Behaviors>
+                            <xct:TextValidationBehavior MaximumLength="88"
+                                                        MinimumLength="88"
+                                                        x:Name="PrivateEntryBehaviour"/>
+                        </Entry.Behaviors>
+                    </Entry>
+                </StackLayout>
+                <Label Text="Ensure you enter a valid string!"
+                           TextColor="IndianRed"
+                           IsVisible="{Binding Source={x:Reference PrivateEntryBehaviour}, Path=IsNotValid}"/>
+
+                <!-- Button Block -->
+                <StackLayout Orientation="Horizontal"
+                             Padding="10"
+                             HorizontalOptions="End">
+                    <Button Text="Submit"
+                            Command="{Binding SubmitCommand}"/>
+                    <Button Text="Delete"
+                            BackgroundColor="PaleVioletRed"
+                            Command="{Binding DeleteCommand}"/>
+                </StackLayout>
+                
+            </StackLayout>
+        </Frame>
+    </ContentPage.Content>
+</ContentPage>

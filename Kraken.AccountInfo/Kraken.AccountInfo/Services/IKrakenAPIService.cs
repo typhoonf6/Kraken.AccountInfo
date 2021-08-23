@@ -1,6 +1,5 @@
-﻿using QuickGraph;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Xamarin.CommunityToolkit.ObjectModel;
 
 namespace Kraken.AccountInfo
 {
@@ -9,8 +8,7 @@ namespace Kraken.AccountInfo
     /// </summary>
     public interface IKrakenAPIService
     {
-        Task CreateCurrencyGraph();
-        Task<IEnumerable<Edge<string>>> GetConversionRoute(string root, string target);
-        Task<string> GetUserHoldings();
+        Task<ObservableRangeCollection<Asset>> InitializeDataAsync();
+        Task<ObservableRangeCollection<Asset>> RefreshDataAsync(ObservableRangeCollection<Asset> assets);
     }
 }

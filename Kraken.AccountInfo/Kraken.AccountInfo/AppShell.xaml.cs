@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 
 namespace Kraken.AccountInfo
 {
@@ -12,7 +10,7 @@ namespace Kraken.AccountInfo
 
             // Page routes
             Routing.RegisterRoute(nameof(PersonalDetailsPage), typeof(PersonalDetailsPage));
-            Routing.RegisterRoute(nameof(AllCoinsPage), typeof(AllCoinsPage));
+            Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));
         }
     }
 }

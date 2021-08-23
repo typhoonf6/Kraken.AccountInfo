@@ -11,6 +11,7 @@ namespace Kraken.AccountInfo
 
             // Registster the service dependency
             DependencyService.Register<KrakenAPIService>();
+            DependencyService.Register<DatabaseService>();
 
             MainPage = new AppShell();
         }
