@@ -121,6 +121,9 @@ namespace Kraken.AccountInfo
 
             foreach (var asset in userAssets)
             {
+                if (asset.ConversionRoute == null)
+                    continue;
+
                 foreach (var leg in asset.ConversionRoute)
                 {
                     var tickerName = $"{leg.Source}{leg.Target},";
@@ -128,9 +131,8 @@ namespace Kraken.AccountInfo
                 }
             }
 
-            sb.Remove(sb.Length - 1, 1);
             var request = new MyWebRequest(APIPath, publicEndpoint, mTicker);
-            var result = await WebRequestHelper.MakeRequestAsync(request, sb.ToString());
+            var result = await WebRequestHelper.MakeRequestAsync(request, sb.Remove(sb.Length - 1, 1).ToString());
             var tickers = JsonConvert.DeserializeObject<KrakenData<Ticker>>(result).result;
             
             foreach (var ticker in tickers)
@@ -156,13 +158,19 @@ namespace Kraken.AccountInfo
             foreach (var asset in userAssets)
             {
                 asset.ConversionRate = 1.0;
-                foreach (var leg in asset.ConversionRoute)
+
+                if (asset.ConversionRoute != null)
                 {
-                    var key = leg.Source + leg.Target;
-                    var askPrice = double.Parse(Pairs[key].Ticker.a[0]);
-                    var bidPrice = double.Parse(Pairs[key].Ticker.b[0]);
-                    asset.ConversionRate *= (askPrice + bidPrice) / 2.0;
+                    foreach (var leg in asset.ConversionRoute)
+                    {
+                        var key = leg.Source + leg.Target;
+                        var askPrice = double.Parse(Pairs[key].Ticker.a[0]);
+                        var bidPrice = double.Parse(Pairs[key].Ticker.b[0]);
+                        asset.ConversionRate *= (askPrice + bidPrice) / 2.0;
+                        //asset.ConversionRate *= double.Parse(Pairs[key].Ticker.p[0]);
+                    }
                 }
+
                 asset.Value = asset.Amount * asset.ConversionRate;
             }
             return userAssets;
