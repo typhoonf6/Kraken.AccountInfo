@@ -34,6 +34,7 @@ namespace Kraken.AccountInfo
         /// <returns></returns>
         private async Task GetData()
         {
+            IsBusy = true;
             UserAssets = await KrakenService.InitializeDataAsync();
             IsBusy = false;
         }

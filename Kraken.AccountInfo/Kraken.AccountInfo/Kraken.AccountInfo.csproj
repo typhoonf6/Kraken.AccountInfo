@@ -1194,7 +1194,7 @@
     <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.4.0" />
-    <PackageReference Include="QuickGraph" Version="3.6.61119.7" />
+    <PackageReference Include="QuikGraph" Version="2.3.0" />
     <PackageReference Include="SkiaSharp" Version="2.80.3" />
     <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
     <PackageReference Include="Xamarin.CommunityToolkit" Version="1.2.0" />
@@ -1204,12 +1204,6 @@
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />  
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
   </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="System.Data.SqlClient">
-        <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft SDKs\UWPNuGetPackages\microsoft.netcore.universalwindowsplatform\6.2.12\ref\uap10.0.15138\System.Data.SqlClient.dll</HintPath>
-      </Reference>
-    </ItemGroup>
 
     <ItemGroup>
       <Compile Update="Views\SettingsPage.xaml.cs">

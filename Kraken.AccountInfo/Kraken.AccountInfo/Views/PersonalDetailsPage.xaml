@@ -4,10 +4,11 @@
              xmlns:krak="clr-namespace:Kraken.AccountInfo"
              xmlns:ff="clr-namespace:FFImageLoading.Svg.Forms;assembly=FFImageLoading.Svg.Forms"
              x:Class="Kraken.AccountInfo.PersonalDetailsPage"
-             BackgroundColor="#ECECEC">
+             BackgroundColor="#ECECEC"
+             x:Name="page">
 
     <ContentPage.BindingContext>
-        <krak:PersonalCoinsViewModel/>
+        <krak:PersonalCoinsViewModel x:Name="personalCoinsViewModel"/>
     </ContentPage.BindingContext>
 
     <ContentPage.Resources>
@@ -21,11 +22,29 @@
     <ContentPage.Content>
 
         <StackLayout Margin="10">
-            
-            <!-- Account Balance -->
-            <Label Text="{Binding UserAssets, Converter={StaticResource totalValueConverter}}" 
-                   FontSize="Title"
-                   HorizontalTextAlignment="Center"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Account Balance -->
+                <Label Text="{Binding UserAssets, Converter={StaticResource totalValueConverter}}" 
+                       FontSize="Title"
+                       HorizontalTextAlignment="Center"
+                       Grid.Column="1"/>
+                <Button Text="Refresh"
+                        Command="{Binding RefreshCommand}"
+                        HorizontalOptions="End"
+                        Grid.Column="2"/>
+            </Grid>
+
+            <StackLayout Orientation="Horizontal">
+
+            </StackLayout>
+
 
             <!-- Coin List -->
             <RefreshView IsRefreshing="{Binding IsBusy}"
@@ -47,12 +66,10 @@
                                BorderColor="Black">
                             <StackLayout>
                                 <Image Source="https://cdn.dribbble.com/users/2140/screenshots/3814090/bitcoin_2x.png?compress=1&amp;resize=400x300" />
-                                <Label Text="No Information to Show"
+                                <Label Text="Refresh to get data"
                                        FontSize="Subtitle"
                                        HorizontalOptions="Center"
                                        VerticalOptions="Center" />
-                                <Button Text="Login to Get Info"
-                                        Margin="250,0" />
                             </StackLayout>
                         </Frame>
                     </CollectionView.EmptyView>

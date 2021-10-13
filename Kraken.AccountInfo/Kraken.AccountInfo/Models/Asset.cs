@@ -1,4 +1,4 @@
-﻿using QuickGraph;
+﻿using QuikGraph;
 using System.Collections.Generic;
 
 namespace Kraken.AccountInfo

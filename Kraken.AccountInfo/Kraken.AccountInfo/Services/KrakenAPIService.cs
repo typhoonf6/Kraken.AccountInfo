@@ -1,7 +1,7 @@
 ﻿using Kraken.AccountInfo;
 using Newtonsoft.Json;
-using QuickGraph;
-using QuickGraph.Algorithms;
+using QuikGraph;
+using QuikGraph.Algorithms;
 using System;
 using System.Collections.Generic;
 using System.Text;
