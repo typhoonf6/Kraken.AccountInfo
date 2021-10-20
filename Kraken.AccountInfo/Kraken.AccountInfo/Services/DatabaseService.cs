@@ -39,10 +39,10 @@ namespace Kraken.AccountInfo
         {
             await init();
 
-            var test = await db.QueryAsync<Keys>("SELECT * FROM [Keys] ORDER BY ROWID ASC LIMIT 1");
+            var keys = await db.QueryAsync<Keys>("SELECT * FROM [Keys] ORDER BY ROWID ASC LIMIT 1");
 
-            if (test.Count > 0)
-                return test[0] as Keys;
+            if (keys.Count > 0)
+                return keys[0] as Keys;
 
             return new Keys();
         }

@@ -79,7 +79,6 @@
                             BackgroundColor="PaleVioletRed"
                             Command="{Binding DeleteCommand}"/>
                 </StackLayout>
-                
             </StackLayout>
         </Frame>
     </ContentPage.Content>
