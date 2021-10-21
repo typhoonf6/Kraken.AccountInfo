@@ -15,6 +15,7 @@
         <ResourceDictionary>
             <krak:TotalValueConverter x:Key="totalValueConverter"/>
             <krak:CurrencyConverter x:Key="currencyConverter"/>
+            <krak:StringCollectionConverter x:Key="stringCollectionConverter"/>
             <ff:SvgImageSourceConverter x:Key="ffConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
@@ -93,6 +94,11 @@
                                                    VerticalOptions="End"
                                                    FontSize="Small"
                                                    Margin="4"/>
+                                            <Label Text="{Binding ConversionRoute, Converter={StaticResource stringCollectionConverter}}"
+                                                   FontSize="Micro"
+                                                   Margin="4"
+                                                   VerticalOptions="End"
+                                                   HorizontalOptions="End"/>
                                         </StackLayout>
                                         <Label Text="{Binding Type}"
                                                FontSize="Small"/>
@@ -100,7 +106,6 @@
                                                    FontSize="Medium"/>
                                         <Label Text="{Binding Value, Converter={StaticResource currencyConverter}}"
                                                FontSize="Medium"/>
-                                        
                                     </StackLayout>
                                 </StackLayout>
                             </Frame>
